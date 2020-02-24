@@ -1,0 +1,39 @@
+const { Router } = require('express');
+const axios = require('axios');
+
+const Dev = require('./models/Dev');
+
+const routes = Router();
+
+routes.post('/devs', async (req, res) => {
+    const { github_username, techs, latitude, longitude } = req.body;
+
+    const techsArray = techs.split(',').map(tech => tech.trim());
+
+    const location = {
+        type: 'Point',
+        coordinates: [latitude, longitude]
+    };
+
+    try {
+        const resGitHub = await axios.get(`https://api.github.com/users/${github_username}`);                
+
+        const { name = login, avatar_url, bio } = resGitHub.data;
+
+        const dev = await Dev.create({
+            github_username,
+            name,
+            avatar_url,
+            bio,
+            techs: techsArray,
+            location
+        });
+
+        return res.status(200).json(dev);
+    } catch (error) {
+        return res.status(500).json(error);       
+    }
+
+});
+
+module.exports = routes;
