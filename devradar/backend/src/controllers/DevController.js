@@ -2,6 +2,9 @@ const axios = require('axios');
 
 const Dev = require('../models/Dev');
 
+const parseStringAsArray = require('../utils/parseStringAsArray');
+
+
 module.exports = {
     index: async (req, res) => {
 
@@ -21,8 +24,8 @@ module.exports = {
 
             let dev = await Dev.findOne({ github_username });            
 
-            if(!dev) {
-                const techsArray = techs.split(',').map(tech => tech.trim());
+            if(!dev) {                
+                const techsArray = parseStringAsArray(techs);
     
                 const location = {
                     type: 'Point',
@@ -45,7 +48,7 @@ module.exports = {
 
             return res.status(200).json(dev);
         } catch (error) {
-            return res.status(500).json(error);       
+            return res.status(500).json(error.message);       
         }
     
     }    
