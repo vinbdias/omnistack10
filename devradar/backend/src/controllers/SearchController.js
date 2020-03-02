@@ -2,17 +2,19 @@ const Dev = require('../models/Dev');
 
 const parseStringAsArray = require('../utils/parseStringAsArray');
 
+const { handleError, ErrorHandler } = require('../helpers/error');
+
 module.exports = {
 
     index: async (req, res) => {
-        const { latitude, longitude, techs } = req.query;
+        const { latitude, longitude, techs } = req.query;        
 
-        const techsArray = parseStringAsArray(techs);
+        const techsArray = parseStringAsArray(techs);                
 
         try {
             const devs = await Dev.find({
                 techs: {
-                    $in: techsArray,
+                    $in: techsArray
                 },
                 location: {
                     $near: {
@@ -23,12 +25,15 @@ module.exports = {
                         $maxDistance: 10000
                     }
                 }
-            });
+            });    
+            
+            if(devs.length === 0) 
+                throw new ErrorHandler(404, 'Nenhum dev encontrado');
 
             return res.status(200).json(devs);
         }
-        catch(error) {
-            return res.status(500).json(error.message);
+        catch(err) {
+            return handleError(err, res);
         }                
     }
 };

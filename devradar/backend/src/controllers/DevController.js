@@ -3,18 +3,20 @@ const axios = require('axios');
 const Dev = require('../models/Dev');
 
 const parseStringAsArray = require('../utils/parseStringAsArray');
-
+const { handleError, ErrorHandler } = require('../helpers/error');
 
 module.exports = {
     index: async (req, res) => {
 
         try {
             const devs = await Dev.find();   
+
+            if(devs.length === 0)
+                throw new ErrorHandler(404, 'Nenhum dev cadastrado');
             
             return res.status(200).json(devs);
-        } catch (error) {
-            
-            return res.status(500).json(error.message);
+        } catch (err) {            
+            return handleError(err, res);
         }        
     },
     store: async (req, res) => {
@@ -29,7 +31,7 @@ module.exports = {
     
                 const location = {
                     type: 'Point',
-                    coordinates: [latitude, longitude]
+                    coordinates: [longitude, latitude]
                 };       
                 
                 const resGitHub = await axios.get(`https://api.github.com/users/${github_username}`);                
@@ -47,8 +49,8 @@ module.exports = {
             }            
 
             return res.status(200).json(dev);
-        } catch (error) {
-            return res.status(500).json(error.message);       
+        } catch (err) {
+            return handleError(err, res);
         }
     
     }    

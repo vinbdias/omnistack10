@@ -3,7 +3,7 @@ const { Router } = require('express');
 const DevController = require('./controllers/DevController');
 const SearchController = require('./controllers/SearchController');
 
-const { ErrorHandler } = require('./helpers/error');
+const { handleError } = require('./helpers/error');
 
 const routes = Router();
 
@@ -12,8 +12,10 @@ routes.get('/devs', DevController.index);
 
 routes.get('/search', SearchController.index);
 
-routes.get('/error', (req, res) => {
-    throw new ErrorHandler(500, 'Internal server error');
-});
+routes.get('/error', (req, res) => handleError({
+    status: 'error',
+    statusCode: 500,
+    message: 'Internal server error'
+  }, res));
 
 module.exports = routes;
