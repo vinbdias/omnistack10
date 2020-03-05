@@ -51,7 +51,6 @@ module.exports = {
             return res.status(200).json(dev);
         } catch (err) {
             return handleError(err, res);
-        }
-    
+        }    
     }    
 };
